@@ -1,0 +1,11 @@
+body {
+    margin: 1rem;
+}
+.navbarHeader{
+    color : rgb(171, 124, 22);
+    font-weight: bold;
+}
+.status{
+    width: 5rem;
+    border: none;
+}
