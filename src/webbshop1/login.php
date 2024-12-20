@@ -2,32 +2,33 @@
 require '../database.php';
 session_start();
 
-if(isset($_GET['deleteOrder'])){
-
-    $sql = 'DELETE FROM Order_lines WHERE id = ' . $_GET['deleteOrder'];
-    echo $sql;
-    $connection->query($sql);
-}
 if (isset($_POST["login"])) {
-    $username = $_POST['username'];
-    $password = $_POST['password'];
-    if ($username == 'klasse' && $password == 'cheese') {
-        $_SESSION['username'] = $username;
+
+    if($stmt = $connection->prepare('SELECT `type`, password FROM Users WHERE name = ?')) {
+       
+        $stmt->bind_param('s', $_POST['username']);
+        $stmt->execute();
+        $stmt->store_result();
+
+        if ($stmt->num_rows > 0) {
+            $stmt->bind_result($type, $password);
+            $stmt->fetch();
+            
+            
+            $isValid = password_verify( $_POST['password'], $password);
+            if (!$isValid) {
+                echo "<script>alert('Invalid username or password, please try again!');</script>";
+            }else{
+                $_SESSION['loggedin'] = TRUE;
+                $_SESSION['name'] = $_POST['username'];
+                $_SESSION['type'] = $type;
+                //$_SESSION['id'] = $id;
+                header('location: userpage.php');
+            }
+        }else{
+            echo "<script>alert('Invalid username or password, please try again!');</script>";
+        }       
     }
-}
-if (isset($_POST['update_status'])) {
-    echo "Status ID: " . $_POST['statusId'];
-    echo "Status: " . $_POST['status'];
-    $status_id = $_POST['statusId'];
-    $status = $_POST['status'];
-
-    $sql = "UPDATE Orders SET status = '$status' WHERE id = $status_id";
-    $result = $connection->query($sql);
-    //echo $result;
-}
-
-if(isset($_POST['logout'])){
-    session_destroy();
 }
 ?>
 <!DOCTYPE html>
@@ -67,53 +68,9 @@ if(isset($_POST['logout'])){
         </div>
     </nav>
     <?php
-    if (isset($_SESSION['username'])) {
-
-        $sql = "SELECT o.id, o.total_amount, o.status, o.order_date, c.firstname, c.country
-                FROM Orders o
-                JOIN Customers c ON c.id = o.customer_id
-                GROUP BY c.firstname, o.id, o.total_amount, o.status, o.order_date, c.country
-                ORDER BY o.order_date";
-        $result = $connection->query($sql);
-        ?>
-        <div class="container mt-4">
-            <div class="row">
-                <?php while ($row = $result->fetch_assoc()) { ?>
-                    <div class="col-md-6 col-lg-4 mb-4">
-                        <div class="card text-bg-light" style="max-width: 18rem;">
-                            <div class="card-header">#Order <?= $row['id'] ?>
-                                <a class="material-icons" style='margin-left:5rem; color:red; text-decoration: none;' href="?deleteOrder= <?= $row['id'] ?> ">&#xe872;</a>
-                            </div>
-                            <div class="card-body">
-                                <h5 class="card-title">Name : <?= $row['firstname'] ?></h5>
-                                <p class="card-text">Total amount : <?= $row['total_amount'] ?> kr</p>
-                                <p class="card-text">Country : <?= $row['country'] ?></p>
-                                <p class="card-text">Status : <?= $row['status'] ?></p>
-                                <p class="card-text">Date : <?= $row['order_date'] ?></p>
-                                <form method="POST">
-                                    <input type="hidden" name="statusId" value="<?= $row['id'] ?>">
-                                    <select name='status'>
-                                        <option value='Ordered'>Ordered</option>
-                                        <option value='Packed'>Packed</option>
-                                        <option value='Shipped'>Shipped</option>
-                                        <option value='Paid'>Paid</option>
-                                    </select>
-                                    <input type="submit" value="Update" name="update_status" class="btn btn-warning" >
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                <?php } ?>
-            </div>
-        </div>
-        <form method="POST">
-            <input type="submit" class="btn btn-light" name="logout" value="Log out">
-        </form>
-        <?php
-    } else { ?>
-
+    if ($_SESSION['loggedin'] === true) { ?>
         <div class="container mt-5">
-            <h2 class="text-center">Login</h2>
+            <h2 class="text-center">Log in</h2>
             <form action="login.php" method="POST" class="mt-4 mx-auto" style="max-width: 400px;">
                 <div class="mb-3">
                     <label for="email" class="form-label">Username:</label>
@@ -128,8 +85,10 @@ if(isset($_POST['logout'])){
                 <button type="submit" class="btn btn-primary w-100" name="login">Login</button>
             </form>
         </div>
-
-        <?php
+    <?php
+    }else{
+        header('location: userpage.php');
+        exit;
     }
     ?>
 </body>

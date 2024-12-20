@@ -108,3 +108,40 @@ UPDATE `Orders` SET `total_amount` = '230.33 ' WHERE `Orders`.`id` = 2;
 
 -- UPDATE products
 UPDATE `Products` SET `image` = 'https://www.gfifoods.com/media/catalog/product/cache/608c797bf41e8874bcf75172f32fd01b/b/a/bayley_hazen_blue.jpg' WHERE `Products`.`id` = 7;
+
+CREATE TABLE Product_Images (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    image_path VARCHAR(255) NOT NULL, 
+    alt_text VARCHAR(255),
+    product_id INT NOT NULL,
+    FOREIGN KEY (product_id) REFERENCES Products(id) ON DELETE CASCADE
+);
+
+INSERT INTO Product_Images (product_id, image_path, alt_text)
+VALUES 
+(1, 'image_path', 'alt_text'),
+INSERT INTO Product_Images (product_id, image_path, alt_text)
+VALUES 
+(7, 'https://www.gfifoods.com/media/catalog/product/cache/608c797bf41e8874bcf75172f32fd01b/b/a/bayley_hazen_blue.jpg', 'This blue cheese is so good it´s almost obscene. Named after the Bayley Hazen road, which winds its way through Vermont´s picturesque northeast kingdom, it is creamy and chocolaty and salty, oh my.');
+(9,'https://saxelbycheese.com/cdn/shop/products/Saxelby_cheeses-130_580x.jpg?v=1661361544','A silky, buttery, bloomy rind sheeps milk triple creme cheese that can put your favorite brie or camembert to shame.'),
+(10,'https://saxelbycheese.com/cdn/shop/products/Saxelby_cheeses-558-2_580x.jpg?v=1663785632', 'This cheddar cheese has been dubbed addictive by certain devoted fans. A hefty, beautiful, and rustic wheel, Cabot clothbound cheddar is rich and caramelly, speckled with bits of crystalline crunchy goodness.'),
+(11,'https://saxelbycheese.com/cdn/shop/files/Saxelby_cheeses-165_580x.jpg?v=1685131358', 'Kunik is a dreamy mold-ripened goats´ milk cheese spiked with fresh Jersey cream in the Adirondack Mountains at Nettle Meadow Farm.'),
+(12,'https://saxelbycheese.com/cdn/shop/products/Saxelby_cheeses-077_580x.jpg?v=1666627040', 'A new take on two classic cheeses! Orange cheddar cheese meets blue cheese in an epiphany of complementary colors - and awesome flavor too!');
+(6, 'https://saxelbycheese.com/cdn/shop/products/Saxelby_cheeses-111-2_580x.jpg?v=1661359810','Burrata cheese: one of mankind´s highest achievements (and guiltiest pleasures!) in the medium of curds and cream.')
+
+
+CREATE TABLE Users (
+    id INT AUTO_INCREMENT PRIMARY KEY,       
+    name VARCHAR(50) NOT NULL,              
+    email VARCHAR(255) NOT NULL,   
+    password VARCHAR(255) NOT NULL,         
+    customer_id INT DEFAULT NULL,           
+    type ENUM('admin', 'customer') NOT NULL DEFAULT 'customer',
+    FOREIGN KEY (customer_id) REFERENCES Customers(id) ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+INSERT INTO Users (name, email, password, customer_id)
+VALUES
+('Emma Johnson', 'emma.johnson@example.com', 'emma123', 1),
+('Oliver Smith', 'oliver.smith@example.com', 'oliver123', 2),
+('Lucas Andersson', 'lucas.andersson@example.com', 'lucas123', 3);
