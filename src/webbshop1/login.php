@@ -4,25 +4,26 @@ session_start();
 
 if (isset($_POST["login"])) {
 
-    if($stmt = $connection->prepare('SELECT `type`, password FROM Users WHERE name = ?')) {
+    // Prepare a SQL statement to securely query the database for the user details
+    if($stmt = $connection->prepare('SELECT type, password, customer_id FROM Users WHERE name = ?')) {
        
         $stmt->bind_param('s', $_POST['username']);
         $stmt->execute();
         $stmt->store_result();
 
+        // Check if a user with the given username exists
         if ($stmt->num_rows > 0) {
-            $stmt->bind_result($type, $password);
+            $stmt->bind_result($type, $password, $id);
             $stmt->fetch();
-            
             
             $isValid = password_verify( $_POST['password'], $password);
             if (!$isValid) {
                 echo "<script>alert('Invalid username or password, please try again!');</script>";
-            }else{
-                $_SESSION['loggedin'] = TRUE;
+            }else{ // If the password is correct set up the user session
+                $_SESSION['loggedin'] = true;
                 $_SESSION['name'] = $_POST['username'];
                 $_SESSION['type'] = $type;
-                //$_SESSION['id'] = $id;
+                $_SESSION['id'] = $id;
                 header('location: userpage.php');
             }
         }else{
@@ -61,14 +62,15 @@ if (isset($_POST["login"])) {
                         <a class="nav-link" href="index.php?page=cart">Cart</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="login.php">Log in</a>
+                        <a class="nav-link" href="">Log in</a>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
     <?php
-    if ($_SESSION['loggedin'] === true) { ?>
+    if ($_SESSION['loggedin'] == false) { 
+        ?>
         <div class="container mt-5">
             <h2 class="text-center">Log in</h2>
             <form action="login.php" method="POST" class="mt-4 mx-auto" style="max-width: 400px;">
@@ -82,14 +84,11 @@ if (isset($_POST["login"])) {
                     <input type="password" name="password" id="password" class="form-control"
                         placeholder="Enter your password" required>
                 </div>
-                <button type="submit" class="btn btn-primary w-100" name="login">Login</button>
+                <button type="submit" class="btn btn-primary w-100" name="login">Log in</button>
             </form>
         </div>
     <?php
-    }else{
-        header('location: userpage.php');
-        exit;
-    }
+    } 
     ?>
 </body>
 </body>
