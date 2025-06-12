@@ -11,12 +11,12 @@ if (isset($_GET['deleteOrder'])) {
 if (isset($_POST['update_status'])) {
     $status_id = $_POST['statusId'];
     $status = $_POST['status'];
-    
+
     $sql = "UPDATE Orders SET status = '$status' WHERE id = $status_id";
     $result = $connection->query($sql);
 }
 
-if (isset($_POST['logout'])) {
+if (isset($_POST["logout"])) {
     $_SESSION['loggedin'] = false;
     header('Location: login.php');
     //exit();
@@ -48,22 +48,22 @@ if (isset($_POST['logout'])) {
                         <a class="nav-link active" aria-current="page" href="index.php?page=home">Home</a>
                     </li>
                     <?php
-                    if ($_SESSION['loggedin'] == true ){
-                        if ($_SESSION['type'] == 'admin'){
-                    ?>
-                    <li class="nav-item">
-                        <a class="nav-link">My Page</a>
-                    </li>
-                    <?php
-                        }else{
-                    ?>
-                    <li class="nav-item">
-                        <a class="nav-link" href="index.php?page=cart">Cart</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link"> <?= $_SESSION['name'] ?></a>
-                    </li>
-                    <?php
+                    if ($_SESSION['loggedin'] == true) {
+                        if ($_SESSION['type'] == 'admin') {
+                            ?>
+                            <li class="nav-item">
+                                <a class="nav-link">My Page</a>
+                            </li>
+                            <?php
+                        } else {
+                            ?>
+                            <li class="nav-item">
+                                <a class="nav-link" href="index.php?page=cart">Cart</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link"> <?= $_SESSION['name'] ?></a>
+                            </li>
+                            <?php
                         }
                     }
                     ?>
@@ -158,10 +158,10 @@ if (isset($_POST['logout'])) {
         <?php
     } else if ($_SESSION['type'] === 'customer') {
         $username = $_SESSION['name'];
+        $customer_id = $_SESSION['id'];
         $sql = "SELECT o.id, o.total_amount, o.status, o.order_date
                 FROM Orders o
-                JOIN Users u ON u.customer_id = o.customer_id
-                WHERE u.name = '$username'
+                WHERE o.customer_id = '$customer_id'
                 ORDER BY o.order_date";
         $result = $connection->query($sql);
         $completedOrders = [];
@@ -174,36 +174,13 @@ if (isset($_POST['logout'])) {
             }
         }
         ?>
-        <!-- Display Active Orders -->
-        <div class="container mt-4">
-            <h3>Active Orders</h3>
-            <div class="row">
-                <?php foreach ($activeOrders as $order) { ?>
-                    <div class="col-md-6 col-lg-4 mb-4">
-                        <div class="card text-bg-light" style="max-width: 18rem;">
-                            <div class="card-header">#Order <?= $order['id'] ?></div>
-                            <div class="card-body">
-                                <p class="card-text">Total amount : <?= $order['total_amount'] ?> kr</p>
-                                <p class="card-text">Status : <?= $order['status'] ?></p>
-                                <p class="card-text">Date : <?= $order['order_date'] ?></p>
-                            </div>
-                        </div>
-                    </div>
-                <?php } ?>
-            </div>
-        </div>
-
-        <!-- Display Completed Orders -->
-        <?php
-        if (count($completedOrders) > 0) {
-            ?>
+            <!-- Display Active Orders -->
             <div class="container mt-4">
-                <h3>Order History</h3>
+                <h3>Active Orders</h3>
                 <div class="row">
-                    <?php
-                    foreach ($completedOrders as $order) { ?>
+                <?php foreach ($activeOrders as $order) { ?>
                         <div class="col-md-6 col-lg-4 mb-4">
-                            <div class="card text-bg-success" style="max-width: 18rem;">
+                            <div class="card text-bg-light" style="max-width: 18rem;">
                                 <div class="card-header">#Order <?= $order['id'] ?></div>
                                 <div class="card-body">
                                     <p class="card-text">Total amount : <?= $order['total_amount'] ?> kr</p>
@@ -212,9 +189,32 @@ if (isset($_POST['logout'])) {
                                 </div>
                             </div>
                         </div>
+                <?php } ?>
+                </div>
+            </div>
+
+            <!-- Display Completed Orders -->
+            <?php
+            if (count($completedOrders) > 0) {
+                ?>
+                <div class="container mt-4">
+                    <h3>Order History</h3>
+                    <div class="row">
                         <?php
-                    }
-        }
+                        foreach ($completedOrders as $order) { ?>
+                            <div class="col-md-6 col-lg-4 mb-4">
+                                <div class="card text-bg-success" style="max-width: 18rem;">
+                                    <div class="card-header">#Order <?= $order['id'] ?></div>
+                                    <div class="card-body">
+                                        <p class="card-text">Total amount : <?= $order['total_amount'] ?> kr</p>
+                                        <p class="card-text">Status : <?= $order['status'] ?></p>
+                                        <p class="card-text">Date : <?= $order['order_date'] ?></p>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php
+                        }
+            }
 
     }
     ?>

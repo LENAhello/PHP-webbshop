@@ -5,8 +5,8 @@ session_start();
 if (isset($_POST["login"])) {
 
     // Prepare a SQL statement to securely query the database for the user details
-    if($stmt = $connection->prepare('SELECT type, password, customer_id FROM Users WHERE name = ?')) {
-       
+    if ($stmt = $connection->prepare('SELECT type, password, customer_id FROM Users WHERE name = ?')) {
+
         $stmt->bind_param('s', $_POST['username']);
         $stmt->execute();
         $stmt->store_result();
@@ -15,20 +15,20 @@ if (isset($_POST["login"])) {
         if ($stmt->num_rows > 0) {
             $stmt->bind_result($type, $password, $id);
             $stmt->fetch();
-            
-            $isValid = password_verify( $_POST['password'], $password);
+
+            $isValid = password_verify($_POST['password'], $password);
             if (!$isValid) {
                 echo "<script>alert('Invalid username or password, please try again!');</script>";
-            }else{ // If the password is correct set up the user session
+            } else { // If the password is correct set up the user session
                 $_SESSION['loggedin'] = true;
                 $_SESSION['name'] = $_POST['username'];
                 $_SESSION['type'] = $type;
                 $_SESSION['id'] = $id;
                 header('location: userpage.php');
             }
-        }else{
+        } else {
             echo "<script>alert('Invalid username or password, please try again!');</script>";
-        }       
+        }
     }
 }
 ?>
@@ -69,7 +69,7 @@ if (isset($_POST["login"])) {
         </div>
     </nav>
     <?php
-    if ($_SESSION['loggedin'] == false) { 
+    if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] == false) {
         ?>
         <div class="container mt-5">
             <h2 class="text-center">Log in</h2>
@@ -87,8 +87,8 @@ if (isset($_POST["login"])) {
                 <button type="submit" class="btn btn-primary w-100" name="login">Log in</button>
             </form>
         </div>
-    <?php
-    } 
+        <?php
+    }
     ?>
 </body>
 </body>

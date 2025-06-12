@@ -146,6 +146,7 @@ if (isset($_POST['checkout'])) {
                         <a class="nav-link active" aria-current="page" href="index.php?page=home">Home</a>
                     </li>
                     <?php
+                    if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"]) {
                     if ($_SESSION['loggedin'] == true) {
                         if ($_SESSION['type'] == 'admin') {
                             ?>
@@ -163,7 +164,7 @@ if (isset($_POST['checkout'])) {
                             </li>
                             <?php
                         }
-                    } else {
+                    }} else {
                         ?>
                         <li class="nav-item">
                             <a class="nav-link" href="index.php?page=cart">Cart</a>
@@ -205,7 +206,7 @@ if (isset($_POST['checkout'])) {
             ?>
             <form action="index.php" method="POST" class="row g-3">
                 <?php
-                if ($_SESSION['loggedin'] == false) {
+                if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] == false) {
                     ?>
                     <div class="col-md-4">
                         First name : <input type="text" name="firstname" class="form-control" id="validationDefault01"
